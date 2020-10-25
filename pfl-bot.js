@@ -33,24 +33,48 @@ client.on('message', message => {
 				menu = (json[dayField]["und"][0]["safe_value"]);
 		 
 				// Remove unwanted and inconsistent HTML elements
-				menu = menu.replace(/<hr \/>/gm, '');
+				menu = menu.replace(/<hr \/>/gm, '');	
 				menu = menu.replace(/<h3>/gm, '');
 				menu = menu.replace(/<div>/gm, '');
+				menu = menu.replace(/\t/gm, '');	
+				menu = menu.replace(/ /gm, '');	//nbsp characters
+
 		 
 				var menumd = turndownService.turndown(menu);
-				
-				menumd = "**Μενού " + days_el[date.getDay()] + ":**\n\n" + menumd;
-				
+
 				// Fix for 'Μεσημεριανό', 'Βραδινό' labels not on newline
 				menumd = menumd.replace(/(\S)(\*\*Μεσημεριανό)/g, "$1\n\n$2");
 				menumd = menumd.replace(/(\S)(\*\*Βραδινό)/g, "$1\n\n$2");
 				
-				// Add underlining for 'Πρωινό', 'Μεσημεριανό', 'Βραδινό' labels
-				menumd = menumd.replace(/(\*\*(Πρωινό|Μεσημεριανό|Βραδινό)\*\*)/g, "__$1__");
-			
-				message.channel.send(menumd);
+				//Break menu to embed fields
+				var regexp = /\n([^\*\*]*)/g;
+				var match = regexp.exec(menumd);
+				
+				var fields = [];
+				
+				while (match != null) {
+					if (/\S/g.test(match[1])) {
+						field = match[1].replace(/\n\n/gm, '');
+						fields.push(field);
+					}
+					match = regexp.exec(menumd);
+				}			
+				
+				const menuEmbed = new Discord.RichEmbed()
+					.setColor(0xff0080)
+					.setTitle('Μενoύ ' + days_el[date.getDay()])
+					.setURL('https://www.auth.gr/units/596/weekly-menu')
+					.addField('Πρωινό', fields[0])
+					.addBlankField()
+					.addField('Μεσημεριανό - 1η επιλογή', fields[1], true)
+					.addField('Μεσημεριανό - 2η επιλογή', fields[2], true)
+					.addBlankField()
+					.addField('Βραδινό - 1η επιλογή', fields[3], true)
+					.addField('Βραδινό - 2η επιλογή', fields[4], true)
+				
+				message.channel.send(menuEmbed);
 			});
         
-    }
+	}
 	
 client.login("your-bot-token-here");
