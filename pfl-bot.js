@@ -29,6 +29,11 @@ client.on('messageCreate', message => {
 		
 		var date = new Date();
 		today = date.getDay();
+		
+		// Sunday's menu ID is 7
+		if (today == 0) {
+			today = 7;
+		}
 		panetarget = ".kt-accordion-pane-" + today;
 
 		( async () => {
