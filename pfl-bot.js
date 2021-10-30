@@ -40,6 +40,7 @@ client.on('messageCreate', message => {
 		  const result = await axios.get('https://www.auth.gr/weekly-menu/');
 		  const $ = cheerio.load(result.data);
 		  var menumd = turndownService.turndown($(panetarget).html());
+		  menumd = menumd.replace(/^.*Πρωινό.*[\s\S]*φρέσκο\s* \s*/mg, "");
 		  message.channel.send(menumd);
 		})();
         
