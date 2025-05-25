@@ -50,6 +50,8 @@ client.on('messageCreate', message => {
 		})();
         
 	}
-	
+
+});
+
 client.login("your-bot-token-here");
 	
